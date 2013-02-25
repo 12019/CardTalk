@@ -276,9 +276,10 @@ namespace CardTalk
 		public const int SCARD_W_UNPOWERED_CARD    = -2146435039;           
 		public const int SCARD_W_RESET_CARD        = -2146435038;           
 		public const int SCARD_W_REMOVED_CARD      = -2146435037;
+        public const int SCARD_W_REMOVED_CARD1     = -2146434967;
 
         public const int SCARD_E_NO_READERS_AVAILABLE = -2146435026;
-
+        
 		/*===========================================================
 		'   PROTOCOL
 		'===========================================================*/
@@ -446,6 +447,7 @@ namespace CardTalk
 				case SCARD_S_SUCCESS:
 					return("OK");//No error was encountered.");
 				case SCARD_W_REMOVED_CARD:
+                case SCARD_W_REMOVED_CARD1:
 					return("The smart card has been removed, so that further communication is not possible.");
 				case SCARD_W_RESET_CARD:
 					return("The smart card has been reset, so any shared state information is invalid.");

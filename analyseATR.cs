@@ -105,31 +105,73 @@ namespace CardTalk
         public String HISTORICAL_BYTES { get { return _historicalBytes; } }
         public String CHECK_BYTE { get { return _TCK; } }
 
+        private String summary = "Summary of extracted information:\nConvention  = {0} (TS)\nFi          = {1,-4} (TA1-HighNibble)  Clock rate conversion factor\nFmax        = {2,-4} (TA1-HighNibble)  max. frequency (MHz)\nDi          = {3,-4} (TA1-LowNibble)   bit rate conversion factor\nBWI         = {4,-4} (TB3-HighNibble)  Block Waiting time Integer\nCWI         = {5,-4} (TB3-LowNibble)   Character Waiting time Integer\nBWT         = {6,-4} (Calculated)      Block Waiting Time\nCWT         = {7,-4} (Calculated)      Block Waiting Time\nN           = {8,-4} (TC1)             extra Guardtime\nCommunication Protocol used => T=1 (TDi-LowNibble)";
+        public String SUMMARY { get { return String.Format(summary, "Direct", _Fi, _f, _Di, _BWI, _CWI, _BWT, _CWT, _N); } }
         public String displayBox = " +-----+-------+------+-------------------------------------------------+\n";
         public String displayBox1 = " | POS | Value | byte | Description                                     |\n";
         private String displayInfoTS = " | {0}  | {1}    | TS   | Initial Character                               |\n";
         private String displayInfoT0 = " | {0}  | {1}    | T0   | Format byte                                     |\n";
+
         private String displayInfoTA1 = " | {0}  | {1}    | TA1  | Global Interface byte, encodes Fi, Di           |\n";
         private String displayInfoTB1 = " | {0}  | {1}    | TB1  | Global deprecated                               |\n";
         private String displayInfoTC1 = " | {0}  | {1}    | TC1  | Global, encodes N                               |\n";
         private String displayInfoTD1 = " | {0}  | {1}    | TD1  | Structural, encodes Y2 and T                    |\n";
-        private String highNibbleInfo = " |       High nibble 0x{0} b({1})                                        |\n";
+
+        private String displayInfoTA2 = " | {0}  | {1}    | TA2  | Global, Specific mode byte                      |\n";
+        private String displayInfoTB2 = " | {0}  | {1}    | TB2  | Global deprecated                               |\n";
+        private String displayInfoTC2 = " | {0}  | {1}    | TC2  | Global, encodes N                               |\n";
+        private String displayInfoTD2 = " | {0}  | {1}    | TD2  | Structural, encodes Y3 and T                    |\n";
+
+        private String displayInfoTA3 = " | {0}  | {1}    | TA3  | Specific to T after T from 0 to 14 in TD(i-1)   |\n";
+        private String displayInfoTB3 = " | {0}  | {1}    | TB3  | Information Field Size (IFSC)                   |\n";
+        private String displayInfoTC3 = " | {0}  | {1}    | TC3  |                                                 |\n";
+        private String displayInfoTD3 = " | {0}  | {1}    | TD3  | Structural, encodes Y3 and T                    |\n";
+
+        private String highNibbleInfo = " |               High nibble 0x{0} b({1})                                |\n";
         private String nibbleInfoB4 = " |                    b4 - {0} - TD{1}                              |\n";
         private String nibbleInfoB3 = " |                    b3 - {0} - TC{1}                              |\n";
         private String nibbleInfoB2 = " |                    b2 - {0} - TB{1}                              |\n";
         private String nibbleInfoB1 = " |                    b1 - {0} - TA{1}                              |\n";
-        private String lowNibbleInfo = " |       Low nibble 0x{0} - {1}";
+        private String lowNibbleInfo = " |               Low nibble 0x{0} - {1}";
 
-        public String DISPLAY_INFO_TS { get { return String.Format(displayInfoTS, _tsPosition.ToString("X2"), _TS); } }
-        public String DISPLAY_INFO_T0 { get { return String.Format(displayInfoT0, _t0Position.ToString("X2"), _T0); } }
+        //private String historicalByteInfo = " | {0}  | {1}    | Historical byte - {2}                                   |\n";
+        private String historicalByteInfo = " | {0}  | {1}    | T{2}  | Historical byte                                 |\n";
+        private String checkInfo = " | {0}  | {1}    | TCK  | Check byte = XOR(T0, ... , last historical byte)|\n";
+
+        public String DISPLAY_INFO_TS { get { return String.Format(displayInfoTS, (_tsPosition + 1).ToString("X2"), _TS); } }
+        public String DISPLAY_INFO_T0 { get { return String.Format(displayInfoT0, (_t0Position + 1).ToString("X2"), _T0); } }
         
-        public String DISPLAY_INFO_TA1 { get { if (_TA1 != "") return String.Format(displayInfoTA1, _ta1Position.ToString("X2"), _TA1); else return ""; } }
-        public String DISPLAY_INFO_TB1 { get { if (_TB1 != "") return String.Format(displayInfoTB1, _tb1Position.ToString("X2"), _TB1); else return ""; } }
-        public String DISPLAY_INFO_TC1 { get { if (_TC1 != "") return String.Format(displayInfoTC1, _tc1Position.ToString("X2"), _TC1); else return ""; } }
-        public String DISPLAY_INFO_TD1 { get { if (_TD1 != "") return String.Format(displayInfoTD1, _td1Position.ToString("X2"), _TD1); else return ""; } }
+        public String DISPLAY_INFO_TA1 { get { if ((_TA1 == "") || (_TA1 == null)) return ""; else return String.Format(displayInfoTA1, (_ta1Position + 1).ToString("X2"), _TA1); } }
+        public String DISPLAY_INFO_TB1 { get { if ((_TB1 == "") || (_TB1 == null)) return ""; else return String.Format(displayInfoTB1, (_tb1Position + 1).ToString("X2"), _TB1); } }
+        public String DISPLAY_INFO_TC1 { get { if ((_TC1 == "") || (_TC1 == null)) return ""; else return String.Format(displayInfoTC1, (_tc1Position + 1).ToString("X2"), _TC1); } }
+        public String DISPLAY_INFO_TD1 { get { if ((_TD1 == "") || (_TD1 == null)) return ""; else return String.Format(displayInfoTD1, (_td1Position + 1).ToString("X2"), _TD1); } }
 
+        public String DISPLAY_INFO_TA2 { get { if ((_TA2 == "") || (_TA2 == null)) return ""; else return String.Format(displayInfoTA2, (_ta2Position + 1).ToString("X2"), _TA2); } }
+        public String DISPLAY_INFO_TB2 { get { if ((_TB2 == "") || (_TB2 == null)) return ""; else return String.Format(displayInfoTB2, (_tb2Position + 1).ToString("X2"), _TB2); } }
+        public String DISPLAY_INFO_TC2 { get { if ((_TC2 == "") || (_TC2 == null)) return ""; else return String.Format(displayInfoTC2, (_tc2Position + 1).ToString("X2"), _TC2); } }
+        public String DISPLAY_INFO_TD2 { get { if ((_TD2 == "") || (_TD2 == null)) return ""; else return String.Format(displayInfoTD2, (_td2Position + 1).ToString("X2"), _TD2); } }
 
-        public String DISPLAY_HIGH_NIBBLE(String infoByte)
+        public String DISPLAY_INFO_TA3 { get { if ((_TA3 == "") || (_TA3 == null)) return ""; else return String.Format(displayInfoTA3, (_ta3Position + 1).ToString("X2"), _TA3); } }
+        public String DISPLAY_INFO_TB3 { get { if ((_TB3 == "") || (_TB3 == null)) return ""; else return String.Format(displayInfoTB3, (_tb3Position + 1).ToString("X2"), _TB3); } }
+        public String DISPLAY_INFO_TC3 { get { if ((_TC3 == "") || (_TC3 == null)) return ""; else return String.Format(displayInfoTC3, (_tc3Position + 1).ToString("X2"), _TC3); } }
+        public String DISPLAY_INFO_TD3 { get { if ((_TD3 == "") || (_TD3 == null)) return ""; else return String.Format(displayInfoTD3, (_td3Position + 1).ToString("X2"), _TD3); } }
+        
+        public String DISPLAY_INFO_TCK { get { if ((_TCK == "") || (_TCK == null)) return ""; else return String.Format(checkInfo, (_tckPosition + 1).ToString("d2"), _TCK); } }
+
+        public String HISTORICAL_BYTE_INFO()
+        {
+            String returnInfo = "";
+            int posInATR = _historicalBytePosition;
+            for (int i = 0; i < _numHistoricalBytes; i++)
+            {
+                posInATR = i + _historicalBytePosition;
+                returnInfo += String.Format(historicalByteInfo, (posInATR + 1).ToString("d2"), _atrBA[posInATR].ToString("X2"), (i + 1).ToString("d2"));
+            }
+
+            return returnInfo;
+        }
+
+        public String DISPLAY_NIBBLE_INFO_T0_TDx(String infoByte)
         {
             String highNbleInfo = "";
             String lowNbleInfo = "";
@@ -140,70 +182,77 @@ namespace CardTalk
             {
                 highNibble = (_atrBA[_t0Position] & 0xF0) >> 4;
                 lowNibble = (_atrBA[_t0Position] & 0x0F);
-                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), (lowNibble.ToString() + " Historical bytes present @ position " + (_historicalBytePosition + 1).ToString("d2") + "     |\n"));
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), (lowNibble.ToString("d2") + " Historical bytes @ position " + (_historicalBytePosition + 1).ToString("d2") + "     |\n"));
                 i = 1;
             }
 
-            if ("TD1" == infoByte)
+            //if ("TD1" == infoByte)
+            if ( ("TD1" == infoByte) && (_TD1 != null) && (_TD1 != ""))
             {
                 highNibble = (_atrBA[_td1Position] & 0xF0) >> 4;
                 lowNibble = (_atrBA[_td1Position] & 0x0F);
-                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "       |\n"));
                 i = 2;
             }
 
-            if ("TD2" == infoByte)
+            //if ("TD2" == infoByte)
+            if ( ("TD2" == infoByte) && (_TD2 != null) && (_TD2 != ""))
             {
                 highNibble = (_atrBA[_td2Position] & 0xF0) >> 4;
                 lowNibble = (_atrBA[_td2Position] & 0x0F);
-                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "       |\n"));
                 i = 2;
             }
 
-            if ("TD3" == infoByte)
+            //if ("TD3" == infoByte)
+            if ( ("TD3" == infoByte) && (_TD3 != null) && (_TD3 != ""))
             {
                 highNibble = (_atrBA[_td3Position] & 0xF0) >> 4;
                 lowNibble = (_atrBA[_td3Position] & 0x0F);
-                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "       |\n"));
                 i = 2;
             }
 
-            highNbleInfo = String.Format(highNibbleInfo, highNibble.ToString("X"), Convert.ToString(highNibble, 2));
-            if (0x08 == (highNibble & 0x08))
+            if (0 != i)
             {
-                highNbleInfo += String.Format(nibbleInfoB4, "1", (i.ToString() + " present"));
-            }
-            else
-            {
-                highNbleInfo += String.Format(nibbleInfoB4, "0", (i.ToString() + " absent "));
+                highNbleInfo = String.Format(highNibbleInfo, highNibble.ToString("X"), Convert.ToString(highNibble, 2).PadLeft(4, '0'));
+                if (0x08 == (highNibble & 0x08))
+                {
+                    highNbleInfo += String.Format(nibbleInfoB4, "1", (i.ToString() + " present"));
+                }
+                else
+                {
+                    highNbleInfo += String.Format(nibbleInfoB4, "0", (i.ToString() + " absent "));
+                }
+
+                if (0x04 == (highNibble & 0x04))
+                {
+                    highNbleInfo += String.Format(nibbleInfoB3, "1", (i.ToString() + " present"));
+                }
+                else
+                {
+                    highNbleInfo += String.Format(nibbleInfoB3, "0", (i.ToString() + " absent "));
+                }
+
+                if (0x02 == (highNibble & 0x02))
+                {
+                    highNbleInfo += String.Format(nibbleInfoB2, "1", (i.ToString() + " present"));
+                }
+                else
+                {
+                    highNbleInfo += String.Format(nibbleInfoB2, "0", (i.ToString() + " absent "));
+                }
+
+                if (0x01 == (highNibble & 0x01))
+                {
+                    highNbleInfo += String.Format(nibbleInfoB1, "1", (i.ToString() + " present"));
+                }
+                else
+                {
+                    highNbleInfo += String.Format(nibbleInfoB1, "0", (i.ToString() + " absent "));
+                }
             }
 
-            if (0x04 == (highNibble & 0x04))
-            {
-                highNbleInfo += String.Format(nibbleInfoB3, "1", (i.ToString() + " present"));
-            }
-            else
-            {
-                highNbleInfo += String.Format(nibbleInfoB3, "0", (i.ToString() + " absent "));
-            }
-
-            if (0x02 == (highNibble & 0x02))
-            {
-                highNbleInfo += String.Format(nibbleInfoB2, "1", (i.ToString() + " present"));
-            }
-            else
-            {
-                highNbleInfo += String.Format(nibbleInfoB2, "0", (i.ToString() + " absent "));
-            }
-
-            if (0x01 == (highNibble & 0x01))
-            {
-                highNbleInfo += String.Format(nibbleInfoB1, "1", (i.ToString() + " present"));
-            }
-            else
-            {
-                highNbleInfo += String.Format(nibbleInfoB1, "0", (i.ToString() + " absent "));
-            }
             return highNbleInfo + lowNbleInfo;
         }
 
@@ -323,7 +372,7 @@ namespace CardTalk
         private void handleTA1()
         {
             // Proceed only if we have a TA1 byte
-            if (0 != _td1Position)
+            if (0 != _ta1Position)
             {
                 _TA1 = utils.ByteToString(_atrBA[_ta1Position]);
                 int fif = (_atrBA[_ta1Position] & 0xF0) >> 4;
@@ -449,6 +498,9 @@ namespace CardTalk
                     _td3Position = td;
                 }
 
+                // Get communication protocol
+                _communicationProtocol = (_atrBA[tdPosition] & 0x0F);
+
                 // If td is 0 then the current position indicates the start of the historical characters
                 if ( (0 == td) && (0 != _numHistoricalBytes) )
                 {
@@ -456,11 +508,9 @@ namespace CardTalk
                     if (0 != _communicationProtocol)
                     {
                        _tckPosition = _currPosition + _numHistoricalBytes;
+                       _TCK = utils.ByteToString(_atrBA[_tckPosition]);
                     }
                 }
-
-                // Get communication protocol
-                _communicationProtocol = (_atrBA[tdPosition] & 0x0F);
             }
         }
 
@@ -478,7 +528,10 @@ namespace CardTalk
         private void handleTA3()
         {
             if (0 != _ta3Position)
+            {
                 _IFSC = _atrBA[_ta3Position];
+                _TA3 = _IFSC.ToString("X2");
+            }
         }
 
         private void handleTB3()
@@ -494,6 +547,8 @@ namespace CardTalk
 
                 _CWT = (int)(Math.Pow(2, _CWI) + 11);
                 _BWT = (int)(11 + (Math.Round(Math.Pow(2, _BWI) * 960 * 372 / (_f * 1000000))));
+
+                _TB3 = _atrBA[_tb3Position].ToString("X2");
             }
         }
 

@@ -127,6 +127,8 @@ namespace CardTalk
         /// <param name="e"></param>
         private void buttonRefreshATR_Click(object sender, EventArgs e)
         {
+            // Clear the ATR Analysis RTB
+            richTextBoxAnalysedATR.Clear();
             //readerActions readers = new readerActions(this);
             string stringATR =_readers.getATR(comboBoxReadersList.SelectedItem.ToString());
             textBoxATR.Text = stringATR;
@@ -459,6 +461,8 @@ namespace CardTalk
 
         private void buttonAnalyseATR_Click(object sender, EventArgs e)
         {
+            richTextBoxAnalysedATR.Clear();
+
             analyseATR analyse = new analyseATR(textBoxATR.Text);
 
             //richTextBoxAnalysedATR.SelectionColor = Color
@@ -468,31 +472,55 @@ namespace CardTalk
             richTextBoxAnalysedATR.AppendText(analyse.displayBox1);
             richTextBoxAnalysedATR.AppendText(analyse.displayBox);
 
-            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TS);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TS);
+            analyseATRPresentation(analyse.DISPLAY_INFO_T0 + analyse.DISPLAY_NIBBLE_INFO_T0_TDx("T0"));
             
-            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_T0);
-            analyseATRPresentation(Color.White, analyse.DISPLAY_HIGH_NIBBLE("T0"));
+            analyseATRPresentation(analyse.DISPLAY_INFO_TA1);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TB1);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TC1);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TD1 + analyse.DISPLAY_NIBBLE_INFO_T0_TDx("TD1"));
 
-            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TA1);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TA2);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TB2);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TC2);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TD2 + analyse.DISPLAY_NIBBLE_INFO_T0_TDx("TD2"));
 
-            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_TB1);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TA3);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TB3);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TC3);
+            analyseATRPresentation(analyse.DISPLAY_INFO_TD3 + analyse.DISPLAY_NIBBLE_INFO_T0_TDx("TD3"));
 
-            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TC1);
+            analyseATRPresentation(analyse.HISTORICAL_BYTE_INFO());
+            analyseATRPresentation(analyse.DISPLAY_INFO_TCK);
 
-            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_TD1);
-            analyseATRPresentation(Color.White, analyse.DISPLAY_HIGH_NIBBLE("TD1"));
-            
+            richTextBoxAnalysedATR.AppendText(analyse.displayBox);
+
+            richTextBoxAnalysedATR.AppendText(analyse.SUMMARY);
             richTextBoxAnalysedATR.ScrollToCaret();
         }
 
-        private void analyseATRPresentation(Color backColor, String text)
+        private Boolean currentColorIsGray = true;
+        private void analyseATRPresentation(String text)
         {
-            int len = richTextBoxAnalysedATR.TextLength;
-            richTextBoxAnalysedATR.SelectionStart = len;
-            
-            richTextBoxAnalysedATR.SelectionLength = text.Length;
-            richTextBoxAnalysedATR.SelectionBackColor = backColor;
-            richTextBoxAnalysedATR.AppendText(text);
+            if (text != "")
+            {
+                int len = richTextBoxAnalysedATR.TextLength;
+                richTextBoxAnalysedATR.SelectionStart = len;
+
+                richTextBoxAnalysedATR.SelectionLength = text.Length;
+                if (true == currentColorIsGray)
+                {
+                    richTextBoxAnalysedATR.SelectionBackColor = Color.LightGray;
+                    currentColorIsGray = false;
+                }
+                else
+                {
+                    richTextBoxAnalysedATR.SelectionBackColor = Color.White;
+                    currentColorIsGray = true;
+                }
+
+                richTextBoxAnalysedATR.AppendText(text);
+            }
         }
 
         private void haveATR(object sender, EventArgs e)

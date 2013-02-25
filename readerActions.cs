@@ -188,6 +188,7 @@ namespace CardTalk
 
         public String getATR(String readerName)
         {
+            int tempCode = 0;
             int retCode = 0;
             String stringATR = null;
 
@@ -244,18 +245,29 @@ namespace CardTalk
                     finally
                     {
                         // Disconnect from the reader
-                        retCode = winscardWrapper.SCardDisconnect(_phCard, 0);
+                        tempCode = winscardWrapper.SCardDisconnect(_phCard, 0);
+                        if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                        {
+                            retCode = tempCode;
+                        }
                     }
                 }
             }
             finally
             {
+
                 // Release context
-                retCode = winscardWrapper.SCardReleaseContext(_phContext);
+                tempCode = winscardWrapper.SCardReleaseContext(_phContext);
+                if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                    retCode = tempCode;
+
                 resetClassVars();
             }
 
-            return stringATR;
+            if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                return stringATR;
+            else
+                return winscardWrapper.GetScardErrMsg(retCode);
         }
 
         /// <summary>
