@@ -71,6 +71,7 @@
             this.tabPageExecuteScript = new System.Windows.Forms.TabPage();
             this.tabPageExecuteTransaction = new System.Windows.Forms.TabPage();
             this.groupBoxActions = new System.Windows.Forms.GroupBox();
+            this.richTextBoxAnalysedATR = new System.Windows.Forms.RichTextBox();
             this.groupBoxRunningLog.SuspendLayout();
             this.tabControlActions.SuspendLayout();
             this.tabPageATR.SuspendLayout();
@@ -109,15 +110,15 @@
             // 
             // textBoxATR
             // 
-            this.textBoxATR.Location = new System.Drawing.Point(16, 15);
+            this.textBoxATR.Location = new System.Drawing.Point(17, 15);
             this.textBoxATR.Name = "textBoxATR";
-            this.textBoxATR.Size = new System.Drawing.Size(495, 22);
+            this.textBoxATR.Size = new System.Drawing.Size(539, 22);
             this.textBoxATR.TabIndex = 4;
             this.textBoxATR.TextChanged += new System.EventHandler(this.haveATR);
             // 
             // buttonRefreshATR
             // 
-            this.buttonRefreshATR.Location = new System.Drawing.Point(66, 46);
+            this.buttonRefreshATR.Location = new System.Drawing.Point(89, 46);
             this.buttonRefreshATR.Name = "buttonRefreshATR";
             this.buttonRefreshATR.Size = new System.Drawing.Size(89, 23);
             this.buttonRefreshATR.TabIndex = 5;
@@ -128,7 +129,7 @@
             // buttonAnalyseATR
             // 
             this.buttonAnalyseATR.Enabled = false;
-            this.buttonAnalyseATR.Location = new System.Drawing.Point(372, 46);
+            this.buttonAnalyseATR.Location = new System.Drawing.Point(395, 46);
             this.buttonAnalyseATR.Name = "buttonAnalyseATR";
             this.buttonAnalyseATR.Size = new System.Drawing.Size(89, 23);
             this.buttonAnalyseATR.TabIndex = 6;
@@ -182,6 +183,7 @@
             // 
             // tabPageATR
             // 
+            this.tabPageATR.Controls.Add(this.richTextBoxAnalysedATR);
             this.tabPageATR.Controls.Add(this.textBoxATR);
             this.tabPageATR.Controls.Add(this.buttonRefreshATR);
             this.tabPageATR.Controls.Add(this.buttonAnalyseATR);
@@ -510,7 +512,7 @@
             this.tabPageSendMultipleCommands.Location = new System.Drawing.Point(4, 24);
             this.tabPageSendMultipleCommands.Name = "tabPageSendMultipleCommands";
             this.tabPageSendMultipleCommands.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageSendMultipleCommands.Size = new System.Drawing.Size(527, 559);
+            this.tabPageSendMultipleCommands.Size = new System.Drawing.Size(572, 559);
             this.tabPageSendMultipleCommands.TabIndex = 1;
             this.tabPageSendMultipleCommands.Text = "Send Commands";
             this.tabPageSendMultipleCommands.UseVisualStyleBackColor = true;
@@ -519,7 +521,7 @@
             // 
             this.tabPageExecuteScript.Location = new System.Drawing.Point(4, 24);
             this.tabPageExecuteScript.Name = "tabPageExecuteScript";
-            this.tabPageExecuteScript.Size = new System.Drawing.Size(527, 559);
+            this.tabPageExecuteScript.Size = new System.Drawing.Size(572, 559);
             this.tabPageExecuteScript.TabIndex = 2;
             this.tabPageExecuteScript.Text = "Execute Script";
             this.tabPageExecuteScript.UseVisualStyleBackColor = true;
@@ -528,7 +530,7 @@
             // 
             this.tabPageExecuteTransaction.Location = new System.Drawing.Point(4, 24);
             this.tabPageExecuteTransaction.Name = "tabPageExecuteTransaction";
-            this.tabPageExecuteTransaction.Size = new System.Drawing.Size(527, 559);
+            this.tabPageExecuteTransaction.Size = new System.Drawing.Size(572, 559);
             this.tabPageExecuteTransaction.TabIndex = 3;
             this.tabPageExecuteTransaction.Text = "Execute Transaction";
             this.tabPageExecuteTransaction.UseVisualStyleBackColor = true;
@@ -542,6 +544,17 @@
             this.groupBoxActions.TabIndex = 10;
             this.groupBoxActions.TabStop = false;
             this.groupBoxActions.Text = "Actions";
+            // 
+            // richTextBoxAnalysedATR
+            // 
+            this.richTextBoxAnalysedATR.BackColor = System.Drawing.SystemColors.Window;
+            this.richTextBoxAnalysedATR.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBoxAnalysedATR.Location = new System.Drawing.Point(17, 75);
+            this.richTextBoxAnalysedATR.Name = "richTextBoxAnalysedATR";
+            this.richTextBoxAnalysedATR.ReadOnly = true;
+            this.richTextBoxAnalysedATR.Size = new System.Drawing.Size(539, 468);
+            this.richTextBoxAnalysedATR.TabIndex = 7;
+            this.richTextBoxAnalysedATR.Text = "";
             // 
             // CardTalk
             // 
@@ -615,6 +628,7 @@
         private System.Windows.Forms.RichTextBox richTextBoxRespData;
         private System.Windows.Forms.Label labelRespDataLen;
         private System.Windows.Forms.Label labelCmdDataNumBytes;
+        private System.Windows.Forms.RichTextBox richTextBoxAnalysedATR;
     }
 }
 

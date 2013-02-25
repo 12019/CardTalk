@@ -81,6 +81,7 @@ namespace CardTalk
             set { _atr = value; initATR(); analyseNow(); }
         }
 
+        public int ATR_LENGTH { get { return _atrLength; } }
         public Boolean IS_ATR_OK { get { return _isATROk; } }
         public String TS_BYTE { get { return _TS; } }
         public String T0_BYTE { get { return _T0; } }
@@ -103,7 +104,109 @@ namespace CardTalk
         public int NUM_HISTORICAL_BYTES { get { return _numHistoricalBytes; } }
         public String HISTORICAL_BYTES { get { return _historicalBytes; } }
         public String CHECK_BYTE { get { return _TCK; } }
+
+        public String displayBox = " +-----+-------+------+-------------------------------------------------+\n";
+        public String displayBox1 = " | POS | Value | byte | Description                                     |\n";
+        private String displayInfoTS = " | {0}  | {1}    | TS   | Initial Character                               |\n";
+        private String displayInfoT0 = " | {0}  | {1}    | T0   | Format byte                                     |\n";
+        private String displayInfoTA1 = " | {0}  | {1}    | TA1  | Global Interface byte, encodes Fi, Di           |\n";
+        private String displayInfoTB1 = " | {0}  | {1}    | TB1  | Global deprecated                               |\n";
+        private String displayInfoTC1 = " | {0}  | {1}    | TC1  | Global, encodes N                               |\n";
+        private String displayInfoTD1 = " | {0}  | {1}    | TD1  | Structural, encodes Y2 and T                    |\n";
+        private String highNibbleInfo = " |       High nibble 0x{0} b({1})                                        |\n";
+        private String nibbleInfoB4 = " |                    b4 - {0} - TD{1}                              |\n";
+        private String nibbleInfoB3 = " |                    b3 - {0} - TC{1}                              |\n";
+        private String nibbleInfoB2 = " |                    b2 - {0} - TB{1}                              |\n";
+        private String nibbleInfoB1 = " |                    b1 - {0} - TA{1}                              |\n";
+        private String lowNibbleInfo = " |       Low nibble 0x{0} - {1}";
+
+        public String DISPLAY_INFO_TS { get { return String.Format(displayInfoTS, _tsPosition.ToString("X2"), _TS); } }
+        public String DISPLAY_INFO_T0 { get { return String.Format(displayInfoT0, _t0Position.ToString("X2"), _T0); } }
         
+        public String DISPLAY_INFO_TA1 { get { if (_TA1 != "") return String.Format(displayInfoTA1, _ta1Position.ToString("X2"), _TA1); else return ""; } }
+        public String DISPLAY_INFO_TB1 { get { if (_TB1 != "") return String.Format(displayInfoTB1, _tb1Position.ToString("X2"), _TB1); else return ""; } }
+        public String DISPLAY_INFO_TC1 { get { if (_TC1 != "") return String.Format(displayInfoTC1, _tc1Position.ToString("X2"), _TC1); else return ""; } }
+        public String DISPLAY_INFO_TD1 { get { if (_TD1 != "") return String.Format(displayInfoTD1, _td1Position.ToString("X2"), _TD1); else return ""; } }
+
+
+        public String DISPLAY_HIGH_NIBBLE(String infoByte)
+        {
+            String highNbleInfo = "";
+            String lowNbleInfo = "";
+            int highNibble = 0;
+            int lowNibble = 0;
+            int i = 0;
+            if ("T0" == infoByte)
+            {
+                highNibble = (_atrBA[_t0Position] & 0xF0) >> 4;
+                lowNibble = (_atrBA[_t0Position] & 0x0F);
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), (lowNibble.ToString() + " Historical bytes present @ position " + (_historicalBytePosition + 1).ToString("d2") + "     |\n"));
+                i = 1;
+            }
+
+            if ("TD1" == infoByte)
+            {
+                highNibble = (_atrBA[_td1Position] & 0xF0) >> 4;
+                lowNibble = (_atrBA[_td1Position] & 0x0F);
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                i = 2;
+            }
+
+            if ("TD2" == infoByte)
+            {
+                highNibble = (_atrBA[_td2Position] & 0xF0) >> 4;
+                lowNibble = (_atrBA[_td2Position] & 0x0F);
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                i = 2;
+            }
+
+            if ("TD3" == infoByte)
+            {
+                highNibble = (_atrBA[_td3Position] & 0xF0) >> 4;
+                lowNibble = (_atrBA[_td3Position] & 0x0F);
+                lowNbleInfo = String.Format(lowNibbleInfo, lowNibble.ToString("X"), ("Communication protocol type T=" + lowNibble.ToString() + "               |\n"));
+                i = 2;
+            }
+
+            highNbleInfo = String.Format(highNibbleInfo, highNibble.ToString("X"), Convert.ToString(highNibble, 2));
+            if (0x08 == (highNibble & 0x08))
+            {
+                highNbleInfo += String.Format(nibbleInfoB4, "1", (i.ToString() + " present"));
+            }
+            else
+            {
+                highNbleInfo += String.Format(nibbleInfoB4, "0", (i.ToString() + " absent "));
+            }
+
+            if (0x04 == (highNibble & 0x04))
+            {
+                highNbleInfo += String.Format(nibbleInfoB3, "1", (i.ToString() + " present"));
+            }
+            else
+            {
+                highNbleInfo += String.Format(nibbleInfoB3, "0", (i.ToString() + " absent "));
+            }
+
+            if (0x02 == (highNibble & 0x02))
+            {
+                highNbleInfo += String.Format(nibbleInfoB2, "1", (i.ToString() + " present"));
+            }
+            else
+            {
+                highNbleInfo += String.Format(nibbleInfoB2, "0", (i.ToString() + " absent "));
+            }
+
+            if (0x01 == (highNibble & 0x01))
+            {
+                highNbleInfo += String.Format(nibbleInfoB1, "1", (i.ToString() + " present"));
+            }
+            else
+            {
+                highNbleInfo += String.Format(nibbleInfoB1, "0", (i.ToString() + " absent "));
+            }
+            return highNbleInfo + lowNbleInfo;
+        }
+
         public analyseATR(String atr)
         {
             _atr = atr;
@@ -115,7 +218,7 @@ namespace CardTalk
 
         private void initATR()
         {
-            _atrLength = _atr.Length;
+            _atrLength = _atr.Replace(" ", "").Length / 2;
             _atrBA = utils.StringToByteArray(_atr); 
             resetATRChars();
         }
@@ -173,6 +276,7 @@ namespace CardTalk
         private void handleT0()
         {
             byte ts = _atrBA[_t0Position];
+            _T0 = utils.ByteToString(ts);
             _currPosition++;
             //byte bitmapNibble = (byte)(ts & 0xF0);
 
@@ -221,6 +325,7 @@ namespace CardTalk
             // Proceed only if we have a TA1 byte
             if (0 != _td1Position)
             {
+                _TA1 = utils.ByteToString(_atrBA[_ta1Position]);
                 int fif = (_atrBA[_ta1Position] & 0xF0) >> 4;
                 int di = _atrBA[_ta1Position] & 0x0F;
 
@@ -265,6 +370,7 @@ namespace CardTalk
             // Proceed only if we have a TB1 byte
             if (0 != position)
             {
+                _TB1 = utils.ByteToString(_atrBA[position]);
                 // If the TB1 byte is present it should have a value of 0x00
                 // This is because according to ISO7816 TB1 and TB2 are deprecatd 
                 //  and the card should not transmit them
@@ -280,6 +386,7 @@ namespace CardTalk
             // Proceed only if we have a TC1 byte
             if (0 != _tc1Position)
             {
+                _TC1 = utils.ByteToString(_atrBA[_tc1Position]);
                 _N = _atrBA[_tc1Position];
             }
         }
@@ -327,6 +434,7 @@ namespace CardTalk
 
                 if (1 == tdCounter)
                 {
+                    _TD1 = utils.ByteToString(_atrBA[tdPosition]);
                     _ta2Position = ta;
                     _tb2Position = tb;
                     _tc2Position = tc;
@@ -334,6 +442,7 @@ namespace CardTalk
                 }
                 else if (2 == tdCounter)
                 {
+                    _TD2 = utils.ByteToString(_atrBA[tdPosition]);
                     _ta3Position = ta;
                     _tb3Position = tb;
                     _tc3Position = tc;

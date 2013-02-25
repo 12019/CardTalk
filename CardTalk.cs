@@ -460,6 +460,39 @@ namespace CardTalk
         private void buttonAnalyseATR_Click(object sender, EventArgs e)
         {
             analyseATR analyse = new analyseATR(textBoxATR.Text);
+
+            //richTextBoxAnalysedATR.SelectionColor = Color
+            richTextBoxAnalysedATR.AppendText("Number of ATR bytes: " + analyse.ATR_LENGTH + " bytes\n");
+
+            richTextBoxAnalysedATR.AppendText(analyse.displayBox);
+            richTextBoxAnalysedATR.AppendText(analyse.displayBox1);
+            richTextBoxAnalysedATR.AppendText(analyse.displayBox);
+
+            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TS);
+            
+            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_T0);
+            analyseATRPresentation(Color.White, analyse.DISPLAY_HIGH_NIBBLE("T0"));
+
+            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TA1);
+
+            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_TB1);
+
+            analyseATRPresentation(Color.LightGray, analyse.DISPLAY_INFO_TC1);
+
+            analyseATRPresentation(Color.White, analyse.DISPLAY_INFO_TD1);
+            analyseATRPresentation(Color.White, analyse.DISPLAY_HIGH_NIBBLE("TD1"));
+            
+            richTextBoxAnalysedATR.ScrollToCaret();
+        }
+
+        private void analyseATRPresentation(Color backColor, String text)
+        {
+            int len = richTextBoxAnalysedATR.TextLength;
+            richTextBoxAnalysedATR.SelectionStart = len;
+            
+            richTextBoxAnalysedATR.SelectionLength = text.Length;
+            richTextBoxAnalysedATR.SelectionBackColor = backColor;
+            richTextBoxAnalysedATR.AppendText(text);
         }
 
         private void haveATR(object sender, EventArgs e)
