@@ -275,7 +275,9 @@ namespace CardTalk
 		public const int SCARD_W_UNRESPONSIVE_CARD = -2146435040;       
 		public const int SCARD_W_UNPOWERED_CARD    = -2146435039;           
 		public const int SCARD_W_RESET_CARD        = -2146435038;           
-		public const int SCARD_W_REMOVED_CARD      = -2146435037;             
+		public const int SCARD_W_REMOVED_CARD      = -2146435037;
+
+        public const int SCARD_E_NO_READERS_AVAILABLE = -2146435026;
 
 		/*===========================================================
 		'   PROTOCOL
@@ -442,7 +444,7 @@ namespace CardTalk
 				case SCARD_F_WAITED_TOO_LONG: 
 					return("An internal consistency timer has expired.");
 				case SCARD_S_SUCCESS:
-					return("No error was encountered.");
+					return("OK");//No error was encountered.");
 				case SCARD_W_REMOVED_CARD:
 					return("The smart card has been removed, so that further communication is not possible.");
 				case SCARD_W_RESET_CARD:
@@ -453,6 +455,8 @@ namespace CardTalk
 					return("The smart card is not responding to a reset.");
 				case SCARD_W_UNSUPPORTED_CARD:
 					return("The reader cannot communicate with the card, due to ATR string configuration conflicts.");
+                case SCARD_E_NO_READERS_AVAILABLE:
+                    return ("No smartcard readers connected or found.");
 				default:
 					return("?");
 			}
@@ -464,7 +468,5 @@ namespace CardTalk
 			// TODO: Add constructor logic here
 			//
 		}
-
-
 	}
 }

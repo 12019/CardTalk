@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="analyseATR.cs" />
     <Compile Include="card.cs" />
     <Compile Include="CardTalk.cs">
       <SubType>Form</SubType>

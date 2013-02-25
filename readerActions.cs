@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+// TODO: Change all uses of String to byte[]
 namespace CardTalk
 {
     public class readerActions
@@ -14,10 +15,25 @@ namespace CardTalk
         private int _phCard;
         private int _pcchReader;
         private int _ActiveProtocol;// IntPtr.Zero;
+        private String _readerToUse;
+        private winscardWrapper.SCARD_IO_REQUEST _pioSendRequest;
+        private CardTalk _cardtalk;
 
         public readerActions()
         {
             resetClassVars();
+        }
+
+        public readerActions(CardTalk cardtalk)
+        {
+            resetClassVars();
+            _cardtalk = cardtalk;
+        }
+
+        public String READER_TO_USE
+        {
+            get { return _readerToUse; }
+            set { _readerToUse = value; }
         }
 
         private void resetClassVars()
@@ -26,12 +42,22 @@ namespace CardTalk
             _phCard = 0;
             _pcchReader = 0;
             _ActiveProtocol = 0;
+            //_readerToUse = null;
         }
 
-        public void semdCmdGetResp(byte[] command, byte[] response)
+        public byte[] sendCmdGetResp(byte[] command, ref byte[] response)
+        {
+            byte[] byteArray = new byte[255];;
+
+            return byteArray;
+        }
+
+        public String __sendCmdGetResp(String command, ref byte[] response, ref byte[] sw1sw2)
         {
             int retCode = 0;
-            String readerName = null;
+            byte[] cmd = utils.StringToByteArray(command);
+
+            //_cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.CMD, utils.ByteArrayToString(command));
 
             try
             {
@@ -44,19 +70,34 @@ namespace CardTalk
                     try
                     {
                         // Now connect to the card reader
-                        retCode = winscardWrapper.SCardConnect(_phContext, readerName, 2, 3, ref _phCard, ref _ActiveProtocol);
+                        retCode = winscardWrapper.SCardConnect(_phContext, _readerToUse, 2, 3, ref _phCard, ref _ActiveProtocol);
 
                         // Check if the connection was established with the said readername
                         if (winscardWrapper.SCARD_S_SUCCESS == retCode)
                         {
-                            int sw1sw2 = 0;
-                            byte[] responseBuffer = new byte[256];
+                            //byte[] responseBuffer = new byte[255];
 
                             winscardWrapper.SCARD_IO_REQUEST ioSend;
                             ioSend.dwProtocol = winscardWrapper.SCARD_PROTOCOL_T1;
                             ioSend.cbPciLength = System.Runtime.InteropServices.Marshal.SizeOf(typeof(winscardWrapper.SCARD_IO_REQUEST));
-                            
-                            //winscardWrapper.SCardTransmit
+
+                            int respLen = 0;
+                            retCode = winscardWrapper.SCardTransmit(_phCard, ref ioSend, ref cmd[0], cmd.Length, ref ioSend, ref response[0], ref respLen);
+                            if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                            {
+                                response = new byte[respLen];
+                                retCode = winscardWrapper.SCardTransmit(_phCard, ref ioSend, ref cmd[0], cmd.Length, ref ioSend, ref response[0], ref respLen);
+                                if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                                {
+                                    // Prepare the response
+                                    //byte[] sw1sw2Byte = new byte[2];
+                                    //Array.Copy(responseBuffer, (responseBuffer.Length - 2), sw1sw2, 0, 2);
+                                    //sw1sw2 = utils.ByteArrayToString(sw1sw2Byte);
+                                    //Array.Resize(ref responseBuffer, responseBuffer.Length - 2);
+                                    //response = utils.ByteArrayToString(responseBuffer);
+                                    //_cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.RSP, response, sw1sw2);
+                                }
+                            }
                         }
                     }
                     finally
@@ -73,12 +114,85 @@ namespace CardTalk
             // Send command data
 
             // Get the response
+            return winscardWrapper.GetScardErrMsg(retCode);
+        }
+        public String sendCmdGetResp(String command, ref String response, ref String sw1sw2)
+        {
+            // Clean the String command from white spaces and send the command
+            return sendCmdGetResp(utils.StringToByteArray(command.Replace(" ", "")), ref response, ref sw1sw2);
+        }
+
+        public String sendCmdGetResp(byte[] command, ref String response, ref String sw1sw2)
+        {
+            int retCode = 0;
+            
+            //_cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.CMD, utils.ByteArrayToString(command));
+            
+            try
+            {
+                // Establish resource manager context
+                retCode = winscardWrapper.SCardEstablishContext(winscardWrapper.SCARD_SCOPE_USER, 0, 0, ref _phContext);
+
+                // Check how to proceed
+                if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                {
+                    try
+                    {
+                        // Now connect to the card reader
+                        retCode = winscardWrapper.SCardConnect(_phContext, _readerToUse, 2, 3, ref _phCard, ref _ActiveProtocol);
+
+                        // Check if the connection was established with the said readername
+                        if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                        {
+                            byte[] responseBuffer = new byte[255];
+
+                            winscardWrapper.SCARD_IO_REQUEST ioSend;
+                            ioSend.dwProtocol = winscardWrapper.SCARD_PROTOCOL_T1;
+                            ioSend.cbPciLength = System.Runtime.InteropServices.Marshal.SizeOf(typeof(winscardWrapper.SCARD_IO_REQUEST));
+                            
+                            int respLen = 0;
+                            retCode = winscardWrapper.SCardTransmit(_phCard, ref ioSend, ref command[0], command.Length, ref ioSend, ref responseBuffer[0], ref respLen);
+                            if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                            {
+                                responseBuffer = new byte[respLen];
+                                retCode = winscardWrapper.SCardTransmit(_phCard, ref ioSend, ref command[0], command.Length, ref ioSend, ref responseBuffer[0], ref respLen);
+                                if (winscardWrapper.SCARD_S_SUCCESS == retCode)
+                                {
+                                    // Prepare the response
+                                    byte[] sw1sw2Byte = new byte[2];
+                                    Array.Copy(responseBuffer, (responseBuffer.Length - 2), sw1sw2Byte, 0, 2);
+                                    sw1sw2 = utils.ByteArrayToString(sw1sw2Byte);
+                                    Array.Resize(ref responseBuffer, responseBuffer.Length - 2);
+                                    response = utils.ByteArrayToString(responseBuffer);
+                                    //_cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.RSP, response, sw1sw2);
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        // Do not reset class variables and release contexts
+                    }
+                }
+            }
+            finally
+            {
+                // Do not reset class variables and release contexts
+            }
+
+            // Send command data
+
+            // Get the response
+            return winscardWrapper.GetScardErrMsg(retCode);
         }
 
         public String getATR(String readerName)
         {
             int retCode = 0;
             String stringATR = null;
+
+            // TODO: set _readerToUse using getters and setter property
+            //_readerToUse = readerName;
 
             try
             {
@@ -118,6 +232,12 @@ namespace CardTalk
                             {
                                 // Convert the byte[] to string to return
                                 stringATR = utils.ByteArrayToString(atr);
+
+                                // Use of delegate
+                                //delegateAppendToRunningLog runningLog = new delegateAppendToRunningLog(_cardtalk.appendToRunningLog);
+                                //runningLog(stringATR);
+
+                                //_cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.ATR, stringATR);
                             }
                         }
                     }
@@ -142,9 +262,9 @@ namespace CardTalk
         /// Get a list of all the readers connected.
         /// </summary>
         /// <returns></returns>
-        public List<String> getReadersList()
+        public int getReadersList(ref List<String> listOfReaders)
         {
-            List<string> listOfReaders = new List<string>();
+            //List<string> listOfReaders = new List<string>();
             
             int retCode = 0;
 
@@ -161,43 +281,56 @@ namespace CardTalk
                     // 4th parameter will contain Length of the mszReaders buffer in characters
                     retCode = winscardWrapper.SCardListReaders(_phContext, null, null, ref _pcchReader);
 
-                    // Now create a byte array to hold the names of the card readers
-                    byte[] mszReaders = new byte[_pcchReader];
-
-                    // Fill readers buffer with second call.
-                    retCode = winscardWrapper.SCardListReaders(_phContext, null, mszReaders, ref _pcchReader);
-
-                    // Populate List with readers.
-                    ASCIIEncoding ascii = new ASCIIEncoding();
-
-                    string currbuff = ascii.GetString(mszReaders);
-                    int len = (int)_pcchReader;
-                    int nullindex = -1;
-                    char nullchar = (char)0;
-
-                    // Iterate through and fill the list with reader names
-                    if (len > 0)
+                    // Proceed if no error
+                    if (winscardWrapper.SCARD_S_SUCCESS == retCode)
                     {
-                        //while ((currbuff[0] != nullchar))
-                        while (currbuff[0] != nullchar)
+                        // Now create a byte array to hold the names of the card readers
+                        byte[] mszReaders = new byte[_pcchReader];
+
+                        // Fill readers buffer with second call.
+                        retCode = winscardWrapper.SCardListReaders(_phContext, null, mszReaders, ref _pcchReader);
+
+                        // Populate List with readers.
+                        ASCIIEncoding ascii = new ASCIIEncoding();
+
+                        string currbuff = ascii.GetString(mszReaders);
+                        String readerList = null;
+                        int len = (int)_pcchReader;
+                        int nullindex = -1;
+                        char nullchar = (char)0;
+
+                        // Iterate through and fill the list with reader names
+                        if (len > 0)
                         {
-                            nullindex = currbuff.IndexOf(nullchar);   // Get null end character.
-                            string reader = currbuff.Substring(0, nullindex);
-                            listOfReaders.Add(reader);
-                            len = len - (reader.Length + 1);
-                            currbuff = currbuff.Substring(nullindex + 1, len);
+                            //while ((currbuff[0] != nullchar))
+                            while (currbuff[0] != nullchar)
+                            {
+                                nullindex = currbuff.IndexOf(nullchar);   // Get null end character.
+                                string reader = currbuff.Substring(0, nullindex);
+
+                                // Prepare readerList string to have the readers names set as: <TAB SPACE> Readername <NEW LING>
+                                readerList += "\t" + reader + "\n";
+
+                                listOfReaders.Add(reader);
+                                len = len - (reader.Length + 1);
+                                currbuff = currbuff.Substring(nullindex + 1, len);
+                            }
+
+
+                            // Update the running log
+                            _cardtalk.appendToRunningLog(CardTalk.DISPLAY_TYPE.CARD_READERS, readerList);
                         }
                     }
                 }
             }
             finally
             {
-                retCode = winscardWrapper.SCardReleaseContext(_phContext);
+                winscardWrapper.SCardReleaseContext(_phContext);
                 //retCode = winscardWrapper.SCardFreeMemory(_phContext, ref _pcchReader);
                 resetClassVars();
             }
 
-            return listOfReaders;
+            return retCode;
         }
     }
 }
