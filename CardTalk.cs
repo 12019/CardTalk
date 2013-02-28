@@ -127,26 +127,23 @@ namespace CardTalk
         /// <param name="e"></param>
         private void buttonRefreshATR_Click(object sender, EventArgs e)
         {
-            // Clear the ATR Analysis RTB
+            // Clear places where ATR and its related stuff exists
+            textBoxATR.Text = "";
             richTextBoxAnalysedATR.Clear();
+
             //readerActions readers = new readerActions(this);
-            string stringATR =_readers.getATR(comboBoxReadersList.SelectedItem.ToString());
-            textBoxATR.Text = stringATR;
-            appendToRunningLog(DISPLAY_TYPE.ATR, stringATR);
+            string stringATR = "";
+            if (true == _readers.getATR(comboBoxReadersList.SelectedItem.ToString(), ref stringATR))
+            {
+                textBoxATR.Text = stringATR;
+                appendToRunningLog(DISPLAY_TYPE.ATR, stringATR);
+            }
+            else
+            {
+                buttonAnalyseATR.Enabled = false;
+                appendToRunningLog((stringATR + "\n\n"), Color.Red);
+            }
         }
-
-        /// <summary>
-        /// Append a message to the running log
-        /// </summary>
-        /// <param name="text">text to append to the running log</param>
-        /*public void appendToRunningLog(String text)
-        {
-            richTextBoxRunningLog.SelectionColor = Color.Fuchsia;
-            richTextBoxRunningLog.AppendText(text);
-
-            richTextBoxRunningLog.SelectionColor = Color.Black;
-            richTextBoxRunningLog.AppendText(text);
-        }*/
 
         /// <summary>
         /// Append a message to the running log
@@ -387,7 +384,7 @@ namespace CardTalk
             }
             else
             {
-                appendToRunningLog(retCode, Color.Red);
+                appendToRunningLog((retCode + "\n\n"), Color.Red);
             }
         }
 

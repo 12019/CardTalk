@@ -186,11 +186,11 @@ namespace CardTalk
             return winscardWrapper.GetScardErrMsg(retCode);
         }
 
-        public String getATR(String readerName)
+        public Boolean getATR(String readerName, ref String stringATR)
         {
             int tempCode = 0;
             int retCode = 0;
-            String stringATR = null;
+            //String stringATR = null;
 
             // TODO: set _readerToUse using getters and setter property
             //_readerToUse = readerName;
@@ -255,7 +255,6 @@ namespace CardTalk
             }
             finally
             {
-
                 // Release context
                 tempCode = winscardWrapper.SCardReleaseContext(_phContext);
                 if (winscardWrapper.SCARD_S_SUCCESS == retCode)
@@ -264,10 +263,14 @@ namespace CardTalk
                 resetClassVars();
             }
 
+            //return retCode;
             if (winscardWrapper.SCARD_S_SUCCESS == retCode)
-                return stringATR;
+                return true;
             else
-                return winscardWrapper.GetScardErrMsg(retCode);
+            {
+                stringATR = winscardWrapper.GetScardErrMsg(retCode);
+                return false;
+            }
         }
 
         /// <summary>
