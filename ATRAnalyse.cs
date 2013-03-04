@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CardTalk
 {
-    class analyseATR
+    class ATRAnalyse
     {
         private const byte _directConvention = 0x3B;
         private const byte _indirectConvention = 0x3F;
@@ -256,7 +256,7 @@ namespace CardTalk
             return highNbleInfo + lowNbleInfo;
         }
 
-        public analyseATR(String atr)
+        public ATRAnalyse(String atr)
         {
             _atr = atr;
 

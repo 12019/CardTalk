@@ -12,6 +12,8 @@ using System.Windows.Forms;
 
 using System.Windows;
 
+using CardTalk.COMMANDS;
+
 namespace CardTalk
 {
     //public delegate void delegateAppendToRunningLog(String text);
@@ -325,31 +327,60 @@ namespace CardTalk
                 initSendCommandTab();
             }
 
+            if (selectedCmd == "GET DATA (ISO)")
+            {
+            }
+
             if (selectedCmd == "GET DATA - DF 20 (SECCOS)")
             {
-                textBoxCLA.Text = "00";
-                textBoxINS.Text = "CA";
-                textBoxP1.Text = "DF";
-                textBoxP2.Text = "20";
-                textBoxLe.Text = "00";
+                GetData getData = new GetData();
+                byte[] command = getData.GET_DATA_ISO7816_CMD(0xdf20);
+
+                textBoxCLA.Text = utils.ByteToString(getData.CLA);
+                textBoxINS.Text = utils.ByteToString(getData.INS);
+                textBoxP1.Text = utils.ByteToString(getData.P1);
+                textBoxP2.Text = utils.ByteToString(getData.P2);
+
+                textBoxCmdData.Text = utils.ByteArrayToString(command);
+                if ("" != textBoxCmdData.Text)
+                    textBoxP3Lc.Text = utils.ByteToString(getData.Lc);
+                
+                textBoxLe.Text = utils.ByteToString(getData.Le);
             }
 
             if (selectedCmd == "GET CHALLENGE (ISO | SECCOS)")
             {
-                textBoxCLA.Text = "00";
-                textBoxINS.Text = "84";
-                textBoxP1.Text = "00";
-                textBoxP2.Text = "00";
-                textBoxLe.Text = "00";
+                GetChallenge getChallenge = new GetChallenge();
+                byte[] command = getChallenge.GET_CHALLENGE_ISO7816_CMD();
+
+                textBoxCLA.Text = utils.ByteToString(getChallenge.CLA);
+                textBoxINS.Text = utils.ByteToString(getChallenge.INS);
+                textBoxP1.Text = utils.ByteToString(getChallenge.P1);
+                textBoxP2.Text = utils.ByteToString(getChallenge.P2);
+
+                textBoxCmdData.Text = utils.ByteArrayToString(command);
+                if ("" != textBoxCmdData.Text)
+                    textBoxP3Lc.Text = utils.ByteToString(getChallenge.Lc);
+                
+                textBoxLe.Text = utils.ByteToString(getChallenge.Le);
             }
 
             if (selectedCmd == "SELECT FILE - MF (SECCOS)")
             {
-                textBoxCLA.Text = "00";
-                textBoxINS.Text = "A4";
-                textBoxP1.Text = "00";
-                textBoxP2.Text = "00";
-                textBoxLe.Text = "00";
+                SelectFile selectFile = new SelectFile();
+
+                byte[] command = selectFile.SELECT_FILE_CMD();
+                
+                textBoxCLA.Text = utils.ByteToString(selectFile.CLA);
+                textBoxINS.Text = utils.ByteToString(selectFile.INS);
+                textBoxP1.Text = utils.ByteToString(selectFile.P1);
+                textBoxP2.Text = utils.ByteToString(selectFile.P2);
+
+                textBoxCmdData.Text = utils.ByteArrayToString(command);
+                if ("" != textBoxCmdData.Text)
+                    textBoxP3Lc.Text = utils.ByteToString(selectFile.Lc);
+
+                textBoxLe.Text = utils.ByteToString(selectFile.Le);
             }
 
             textBoxCompleteCmd.Text = textBoxCLA.Text + textBoxINS.Text + textBoxP1.Text + textBoxP2.Text + textBoxP3Lc.Text + textBoxCmdData.Text + textBoxLe.Text;
@@ -460,7 +491,7 @@ namespace CardTalk
         {
             richTextBoxAnalysedATR.Clear();
 
-            analyseATR analyse = new analyseATR(textBoxATR.Text);
+            ATRAnalyse analyse = new ATRAnalyse(textBoxATR.Text);
 
             //richTextBoxAnalysedATR.SelectionColor = Color
             richTextBoxAnalysedATR.AppendText("Number of ATR bytes: " + analyse.ATR_LENGTH + " bytes\n");

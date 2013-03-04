@@ -22,8 +22,15 @@ namespace CardTalk
         }
         public static String ByteArrayToString(byte[] byteArray)
         {
-            string hex = BitConverter.ToString(byteArray);
-            return hex.Replace("-", " ");
+            if (null == byteArray)
+            {
+                return "";
+            }
+            else
+            {
+                string hex = BitConverter.ToString(byteArray);
+                return hex.Replace("-", " ");
+            }
         }
 
         public static byte[] StringToByteArray(String hex)

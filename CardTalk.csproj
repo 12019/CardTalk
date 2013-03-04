@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="analyseATR.cs" />
+    <Compile Include="ATRAnalyse.cs" />
     <Compile Include="card.cs" />
     <Compile Include="CardTalk.cs">
       <SubType>Form</SubType>
@@ -54,6 +54,19 @@
     <Compile Include="CardTalk.Designer.cs">
       <DependentUpon>CardTalk.cs</DependentUpon>
     </Compile>
+    <Compile Include="COMMANDS\AppendRecord.cs" />
+    <Compile Include="COMMANDS\EraseBinary.cs" />
+    <Compile Include="COMMANDS\ExternalAuthenticate.cs" />
+    <Compile Include="COMMANDS\GetChallenge.cs" />
+    <Compile Include="COMMANDS\GetData.cs" />
+    <Compile Include="COMMANDS\InternalAuthenticate.cs" />
+    <Compile Include="COMMANDS\ISO7816Commands.cs" />
+    <Compile Include="COMMANDS\PutData.cs" />
+    <Compile Include="COMMANDS\ReadRecord.cs" />
+    <Compile Include="COMMANDS\SelectFile.cs" />
+    <Compile Include="COMMANDS\UpdateRecord.cs" />
+    <Compile Include="COMMANDS\Verify.cs" />
+    <Compile Include="COMMANDS\WriteRecord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="readerActions.cs" />
@@ -84,6 +97,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
